@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nix.dao.MemberMapper">
+    <resultMap id="BaseResultMap" type="com.nix.model.MemberBaseModel">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="createDate" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="updateDate" property="updateDate" jdbcType="TIMESTAMP"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="sex" property="sex" jdbcType="BIT"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="balance" property="balance" jdbcType="DECIMAL"/>
+        <result column="img" property="img" jdbcType="VARCHAR"/>
+        <association property="role" column="role" select="com.nix.dao.RoleMapper.selectMemberRole"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.nix.model.MemberBaseModel">
+        insert into `member`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                `id`,
+            </if>
+            <if test="createDate != null">
+                `createDate`,
+            </if>
+            <if test="updateDate != null">
+                `updateDate`,
+            </if>
+            <if test="username != null">
+                `username`,
+            </if>
+            <if test="password != null">
+                `password`,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="age != null">
+                `age`,
+            </if>
+            <if test="sex != null">
+                `sex`,
+            </if>
+            <if test="phone != null">
+                `phone`,
+            </if>
+            <if test="balance != null">
+                `balance`,
+            </if>
+            <if test="img != null">
+                `img`,
+            </if>
+            <if test="role != null">
+                `role`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=BIT},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="balance != null">
+                #{balance,jdbcType=DECIMAL},
+            </if>
+            <if test="img != null">
+                #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="role != null">
+                #{role.id,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete  from `member` where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <update id="update" parameterType="com.nix.model.MemberBaseModel">
+        update `member`
+        set
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="id != null">
+                `id` = #{id,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+                `createDate` = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null">
+                `updateDate` = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="username != null">
+                `username` = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                `password` = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                `age` = #{age,jdbcType=INTEGER},
+            </if>
+            <if test="sex != null">
+                `sex` = #{sex,jdbcType=BIT},
+            </if>
+            <if test="phone != null">
+                `phone` = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="balance != null">
+                `balance` = #{balance,jdbcType=DECIMAL},
+            </if>
+            <if test="img != null">
+                `img` = #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="role != null">
+                `role` = #{role.id,jdbcType=VARCHAR},
+            </if>
+        </trim>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="maxId" resultType="Integer">
+        select max(`id`) from `member`;
+    </select>
+    <select id="count" resultType="Long">
+        select count(`id`) from `member`;
+    </select>
+    <select id="findByOneField" resultMap="BaseResultMap">
+        select * from `member` where `${field}` = #{value,jdbcType=VARCHAR}
+    </select>
+    <select id="select" parameterType="int" resultMap="BaseResultMap">
+        select * from `member` where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="list" resultMap="BaseResultMap">
+        select * from `member`
+        <if test="conditions != null">
+            where ${conditions}
+        </if>
+        <if test="order != null and sort != null">
+            order by ${sort} ${order}
+        </if>
+        <if test="offset != null">
+            limit #{offset,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+        </if>
+    </select>
+    <select id="login" resultMap="BaseResultMap">
+        select * from `member` where `password` = #{password} and `username` = #{username}
+    </select>
+    <select id="selectLazy" resultMap="BaseResultMap">
+        select * from `member` where id = #{member}
+    </select>
+</mapper>
