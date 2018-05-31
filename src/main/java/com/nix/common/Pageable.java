@@ -1,7 +1,9 @@
 package com.nix.common;
 
+
 import com.nix.model.base.BaseModel;
 import com.nix.service.BaseService;
+import com.nix.util.SQLUtil;
 
 import java.util.List;
 
@@ -11,19 +13,16 @@ import java.util.List;
  * 分页插件
  */
 public class Pageable<M extends BaseModel<M>> {
-    //当前页面
     private Integer page;
-    //页面大小
     private Integer limit;
-    //排序方式
     private String order;
-    //排序字段
     private String sort;
-    //条件sql
+    private String field;
+    private String value;
+    private String tables;
     private String conditionsSql;
-    //执行service
     private BaseService<M> baseService;
-
+    private List list;
     public Integer getPage() {
         return page;
     }
@@ -63,15 +62,42 @@ public class Pageable<M extends BaseModel<M>> {
     public void setConditionsSql(String conditionsSql) {
         this.conditionsSql = conditionsSql;
     }
-    public Integer getCount() {
-        return baseService.list(null,null,null,null,conditionsSql).size();
+    public void setConditionsSql(String conditionsSql,Object ... values) {
+        this.conditionsSql = SQLUtil.sqlFormat(conditionsSql,values);
     }
 
-    /**
-     * 获取分页内容
-     * */
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getTables() {
+        return tables;
+    }
+
+    public void setTables(String tables) {
+        this.tables = tables;
+    }
+
     public List<M> getList(BaseService<M> service) {
         baseService = service;
-        return service.list(page,limit,order,sort,conditionsSql);
+        list = service.list(tables,page,limit,order,sort,conditionsSql);
+        return list;
     }
+
+    public Integer getCount() {
+        return baseService.list(tables,null,null,null,null,conditionsSql).size();
+    }
+
 }

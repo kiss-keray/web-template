@@ -3,6 +3,7 @@ package com.nix.controller.admin;
 import com.nix.common.Pageable;
 import com.nix.common.ReturnObject;
 import com.nix.common.annotation.AdminController;
+import com.nix.common.cache.MemberCache;
 import com.nix.model.MemberBaseModel;
 import com.nix.service.impl.MemberService;
 import com.nix.service.impl.RoleService;

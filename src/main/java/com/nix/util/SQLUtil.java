@@ -2,9 +2,8 @@ package com.nix.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -67,6 +66,22 @@ public class SQLUtil {
 		
 		return stringBuilder.toString();
 	}
+
+	public static String sqlFormat(String condition, Object ... values) {
+		if (!condition.matches(".*\\?.*")) {
+			return condition;
+		}
+		String value;
+		if (values[0] instanceof Date) {
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			value = simpleDateFormat.format((Date) values[0]);
+		} else if (values[0] instanceof java.sql.Date) {
+			value = ((java.sql.Date) values[0]).toLocaleString();
+		} else {
+			value = values[0].toString();
+		}
+		return sqlFormat(condition.replaceFirst("\\?",value),Arrays.copyOfRange(values,1,values.length));
+	}
 	
 	public static Integer getOffset(Integer curPage, Integer limit) {
 		if (curPage == null || limit < 1 || curPage == null || curPage < 0) {
@@ -98,8 +113,8 @@ public class SQLUtil {
 		
 		
 		
-		String condition = "username = ? and sex = ? and create_date = ? and update_date = ?";
+		String condition = "username = '?' and sex = '?' and create_date = '?' and update_date = '?'";
 		Object[] values = new Object[] {"Ming", 1, new Date(), new java.sql.Date(System.currentTimeMillis())};
-		System.out.println(fillCondition(condition, values));
+		System.out.println(sqlFormat(condition, values));
 	}
 }
