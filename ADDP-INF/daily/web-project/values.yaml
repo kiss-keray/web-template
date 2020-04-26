@@ -1,0 +1,37 @@
+namespace: app-daily
+replicaCount: 1
+appPort: 9367
+livenessProbePath: /check-health
+readinessProbePath: /check-health
+image:
+  repository: docker.yunxuebao.com/web-project-daily
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: web-project-daily
+fullnameOverride: web-project-daily
+
+serviceAccount:
+  create: false
+  name:
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  name: http
+
+ingress:
+  enabled: false
+
+resources: {}
+
+nodeSelector:
+  k8s/daily-work: 'true'
+
+tolerations: []
+
+affinity: {}
