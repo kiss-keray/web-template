@@ -31,3 +31,8 @@ target/
 ### log ###
 *.log
 /log/
+
+### config ###
+
+*-config.yml
+*-config.xml

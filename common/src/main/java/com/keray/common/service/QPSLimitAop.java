@@ -10,6 +10,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,9 +26,10 @@ import java.lang.reflect.Method;
 @Aspect
 @Service(value = "QPSLimitAop")
 @Slf4j
+@ConditionalOnBean(IUserContext.class)
 public class QPSLimitAop {
 
-    @Resource(name = "threadLocalUserContext")
+    @Autowired
     private IUserContext userContext;
 
     @Pointcut("@annotation(com.keray.common.annotation.QPSLimitSupport)")

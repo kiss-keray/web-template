@@ -15,7 +15,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Configuration("apiSpringMvcConfig")
-@ConditionalOnProperty(name = "api.json.open", havingValue = "true")
+@ConditionalOnProperty(name = "keray.api.json", havingValue = "true")
 public class ApiMvcConfigK implements WebMvcConfigurer {
 
     @Resource(name = "apiJsonParamResolver")

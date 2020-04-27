@@ -29,8 +29,8 @@ import java.util.List;
  * date:2020/1/10 3:33 PM
  */
 @Slf4j
-@ConditionalOnProperty(name = "api.json.open", havingValue = "true")
-@ConfigurationProperties(prefix = "api.json", ignoreInvalidFields = true)
+@ConditionalOnProperty(name = "keray.api.json.open", havingValue = "true")
+@ConfigurationProperties(prefix = "keray.api.json", ignoreInvalidFields = true)
 @AutoConfigureAfter(RequestMappingHandlerAdapter.class)
 @Configuration
 public class ApiMvcConfig {
@@ -41,7 +41,7 @@ public class ApiMvcConfig {
 
     @Getter
     @Setter
-    private Boolean jsonFormat = false;
+    private Boolean globalSwitch = false;
 
     /**
      * <p>
@@ -58,7 +58,7 @@ public class ApiMvcConfig {
     public ApiJsonParamResolver apiJsonParamResolver(@Qualifier("kObjectMapper") ObjectMapper objectMapper) {
         configBug(objectMapper);
         List<HandlerMethodArgumentResolver> resolvers = new LinkedList<>();
-        ApiJsonParamResolver apiJsonParamResolver = new ApiJsonParamResolver(adapter.getMessageConverters(), resolvers, jsonFormat);
+        ApiJsonParamResolver apiJsonParamResolver = new ApiJsonParamResolver(adapter.getMessageConverters(), resolvers, globalSwitch);
         resolvers.add(apiJsonParamResolver);
         resolvers.add(new PageableHandlerMethodArgumentResolver());
         if (adapter.getArgumentResolvers() == null) {

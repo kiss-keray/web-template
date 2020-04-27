@@ -31,6 +31,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,6 +57,7 @@ import java.util.Map;
 @Aspect
 @Slf4j
 @Order
+@ConditionalOnBean(IUserContext.class)
 public class MybatisPlusSqlInjector {
 
     private final IUserContext userContext;

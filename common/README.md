@@ -2,7 +2,10 @@
 ```yaml
 keray: 
   schedule: true # 定时任务配置
-  api
+  api: 
+    json: 
+      open: true # json解析
+      global-switch: # 全局开启json解析
     data: true # 接口qps配置
     time: true # 接口时长统计
     
