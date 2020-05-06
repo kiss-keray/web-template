@@ -106,6 +106,9 @@ public interface IBaseMapper<T extends IBaseEntity> extends BaseMapper<T> {
         return this.delete(Wrappers.<T>update().in("id", idList));
     }
 
+    default boolean exits(Wrapper<T> wrapper) {
+        return selectCount(wrapper) > 0;
+    }
 
     @Override
     default int delete(Wrapper<T> wrapper) {
