@@ -39,21 +39,21 @@ public class IServletInvocableHandlerMethod extends ServletInvocableHandlerMetho
         Consumer<Object> logFail = result -> {
             try {
                 if (result instanceof Result.FailResult || result instanceof Exception) {
-                    String url = "错误";
-                    String flag = "未知";
+                    String url = null;
+                    String flag = null;
                     try {
                         HttpServletRequest servletRequest = request.getNativeRequest(HttpServletRequest.class);
                         if (servletRequest != null) {
-                            String aUrl = servletRequest.getRequestURL().toString();
-                            if (StrUtil.isNotBlank(aUrl)) {
-                                url = aUrl;
+                            url = servletRequest.getRequestURL().toString();
+                            if (StrUtil.isBlank(url)) {
+                                url = "错误";
                             }
-                            String aFlag = servletRequest.getHeader("X-User-Agent");
-                            if (StrUtil.isBlank(aFlag)) {
-                                aFlag = servletRequest.getHeader("User-Agent");
+                            flag = servletRequest.getHeader("X-User-Agent");
+                            if (StrUtil.isBlank(flag)) {
+                                flag = servletRequest.getHeader("User-Agent");
                             }
-                            if (StrUtil.isNotBlank(aFlag)) {
-                                flag = aFlag;
+                            if (StrUtil.isBlank(flag)) {
+                                flag = "未知";
                             }
                         }
                     } catch (Exception e) {
