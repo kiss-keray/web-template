@@ -8,17 +8,13 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.keray.common.CommonResultCode;
-import com.keray.common.Fetch;
-import com.keray.common.IBaseMapper;
-import com.keray.common.SysThreadPool;
+import com.keray.common.*;
 import com.keray.common.annotation.DiamondSupport;
 import com.keray.common.exception.BizRuntimeException;
 import com.keray.common.service.SystemConstants;
 import com.keray.common.service.ienum.type.SysConfigType;
 import com.keray.common.service.mapper.SysConfigMapper;
 import com.keray.common.service.model.SysConfigModel;
-import com.keray.common.service.service.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -42,7 +38,7 @@ import java.util.stream.Collectors;
  * date:2019/8/26 10:29
  */
 @Slf4j
-public class SysConfigService extends BaseServiceImpl<SysConfigModel> {
+public class SysConfigService implements BaseService<SysConfigModel> {
     @Resource
     private SysConfigMapper sysConfigMapper;
 
@@ -70,7 +66,7 @@ public class SysConfigService extends BaseServiceImpl<SysConfigModel> {
             entity.setId(old.getId());
             return this.update(entity);
         }
-        return super.insert(entity);
+        return getMapper().insert(entity) == 1;
     }
 
     @Override
@@ -91,7 +87,7 @@ public class SysConfigService extends BaseServiceImpl<SysConfigModel> {
         } catch (IllegalAccessException e) {
             throw new BizRuntimeException(CommonResultCode.dataChangeError);
         }
-        return super.update(entity);
+        return getMapper().updateById(entity) == 1;
     }
 
     public Object getValue(String key) {

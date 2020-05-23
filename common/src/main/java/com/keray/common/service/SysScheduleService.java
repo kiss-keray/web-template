@@ -9,16 +9,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.keray.common.BaseEntity;
-import com.keray.common.IBaseMapper;
-import com.keray.common.SpringContextHolder;
-import com.keray.common.SysThreadPool;
+import com.keray.common.*;
 import com.keray.common.annotation.KSchedule;
 import com.keray.common.annotation.KScheduleDelay;
 import com.keray.common.service.ienum.ScheduleStatus;
 import com.keray.common.service.mapper.SysScheduleMapper;
 import com.keray.common.service.model.SysScheduleModel;
-import com.keray.common.service.service.BaseServiceImpl;
 import com.keray.common.support.RedissonLock;
 import com.keray.common.utils.KZEngine;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +58,7 @@ import java.util.stream.Stream;
 @Service(value = "sysScheduleService")
 @Slf4j
 @ConditionalOnProperty(value = "keray.schedule", havingValue = "true")
-public class SysScheduleService extends BaseServiceImpl<SysScheduleModel> {
+public class SysScheduleService implements BaseService<SysScheduleModel> {
     private final ThreadLocal<Boolean> scheduleExecFlag = new ThreadLocal<>();
     private final String driverId = RandomUtil.randomString(64);
     private final ScheduledExecutorService schedulingException = new ScheduledThreadPoolExecutor(10, r -> {

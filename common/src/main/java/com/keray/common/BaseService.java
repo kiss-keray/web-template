@@ -14,12 +14,14 @@ import com.keray.common.exception.BizRuntimeException;
 import com.keray.common.service.model.SortBaseModel;
 import com.keray.common.service.service.SortService;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author by keray
@@ -33,13 +35,34 @@ public interface BaseService<T extends IBaseEntity> {
      */
     IBaseMapper<T> getMapper();
 
+
     /**
      * 添加
      *
      * @param entity insert实体
      * @return
      */
-    Boolean insert(T entity);
+    default Boolean insert(T entity) {
+        return getMapper().insert(entity) == 1;
+    }
+
+    /**
+     * <p>
+     * 插入（批量）
+     * </p>
+     *
+     * @param entityList 实体对象列表
+     * @param batchSize  插入批次数量
+     * @return boolean
+     */
+    default boolean insertBatch(List<T> entityList, int batchSize) {
+        return getMapper().insertBatch(entityList, batchSize);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    default boolean insertBatch(List<T> entityList) {
+        return getMapper().insertBatch(entityList, 50);
+    }
 
     /**
      * 修改
@@ -47,7 +70,12 @@ public interface BaseService<T extends IBaseEntity> {
      * @param entity update实体
      * @return
      */
-    Boolean update(T entity);
+    default Boolean update(T entity) {
+        if (StrUtil.isBlank(entity.getId())) {
+            throw new BizRuntimeException("update必须拥有Id", CommonResultCode.dataChangeError.getCode());
+        }
+        return getMapper().updateById(entity) == 1;
+    }
 
     /**
      * 基础实体修改
@@ -69,7 +97,12 @@ public interface BaseService<T extends IBaseEntity> {
      * @param id 实体id
      * @return
      */
-    Boolean delete(String id);
+    default Boolean delete(String id) {
+        if (!this.canDelete(Collections.singletonList(id))) {
+            throw new BizRuntimeException(CommonResultCode.dataNotAllowDelete);
+        }
+        return getMapper().deleteById(id) == 1;
+    }
 
     /**
      * 批量逻辑删除
@@ -77,7 +110,23 @@ public interface BaseService<T extends IBaseEntity> {
      * @param ids 实体id
      * @return
      */
-    Boolean delete(Collection<? extends Serializable> ids);
+    @Transactional(rollbackFor = RuntimeException.class)
+    default Boolean delete(Collection<? extends Serializable> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            throw new BizRuntimeException(CommonResultCode.illegalArgument);
+        }
+        if (ids.size() == 1) {
+            return delete((String) ((List) ids).get(0));
+        }
+        ids = ids.stream().distinct().collect(Collectors.toList());
+        if (!this.canDelete(ids)) {
+            throw new BizRuntimeException(CommonResultCode.dataNotAllowDelete);
+        }
+        if (getMapper().deleteBatchIds(ids) != ids.size()) {
+            throw new BizRuntimeException(CommonResultCode.dataChangeError);
+        }
+        return true;
+    }
 
     /**
      * 通过id查询数据
@@ -85,7 +134,9 @@ public interface BaseService<T extends IBaseEntity> {
      * @param id 实体id
      * @return T
      */
-    T getById(String id);
+    default T getById(String id) {
+        return getMapper().selectById(id);
+    }
 
     /**
      * 分页查询
@@ -93,8 +144,9 @@ public interface BaseService<T extends IBaseEntity> {
      * @param pager 分页参数
      * @return 分页数据
      */
-    IPage<T> page(Page<T> pager);
-
+    default IPage<T> page(Page<T> pager) {
+        return this.page(pager, null);
+    }
 
     /**
      * 分页查询
@@ -103,7 +155,9 @@ public interface BaseService<T extends IBaseEntity> {
      * @param queryWrapper
      * @return 分页数据
      */
-    IPage<T> page(Page<T> pager, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    default IPage<T> page(Page<T> pager, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper){
+        return getMapper().selectPage(this.pageProcessing(pager), queryWrapper);
+    }
 
 
     /**
@@ -112,7 +166,9 @@ public interface BaseService<T extends IBaseEntity> {
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      * @return
      */
-    List<T> selectList(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    default List<T> selectList(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper) {
+        return getMapper().selectList(this.wrapperProcessing(queryWrapper));
+    }
 
 
     /**
@@ -121,14 +177,18 @@ public interface BaseService<T extends IBaseEntity> {
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      * @return
      */
-    T selectOne(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    default T selectOne(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper) {
+        return getMapper().selectOne(queryWrapper);
+    }
 
     /**
      * 根据 Wrapper 条件，查询总记录数
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    Integer selectCount(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    default Integer selectCount(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper) {
+        return getMapper().selectCount(queryWrapper);
+    }
 
     /**
      * <p>
@@ -141,7 +201,9 @@ public interface BaseService<T extends IBaseEntity> {
      * @return <p> {@link boolean} </p>
      * @throws
      */
-    boolean contains(String id);
+    default boolean contains(String id) {
+        return getMapper().contains(id);
+    }
 
     /**
      * <p>
@@ -159,7 +221,7 @@ public interface BaseService<T extends IBaseEntity> {
     }
 
 
-    default <E extends BaseEntity> Page<E> pageProcessing(Page<E> page) {
+    default Page<T> pageProcessing(Page<T> page) {
         if (this instanceof SortService) {
             List<OrderItem> orders = page.orders();
             if (CollUtil.isEmpty(orders)) {
@@ -180,7 +242,7 @@ public interface BaseService<T extends IBaseEntity> {
     default <E extends IBaseEntity> Wrapper<E> wrapperProcessing(Wrapper<E> wrapper) {
         if (this instanceof SortService) {
             if (wrapper == null) {
-                wrapper =  Wrappers.lambdaQuery();
+                wrapper = Wrappers.lambdaQuery();
             }
             if (wrapper instanceof QueryWrapper) {
                 ((QueryWrapper<E>) wrapper).orderByAsc("sort");

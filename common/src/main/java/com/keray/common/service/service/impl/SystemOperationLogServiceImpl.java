@@ -1,10 +1,10 @@
 package com.keray.common.service.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.keray.common.service.service.BaseServiceImpl;
+import com.keray.common.BaseService;
 import com.keray.common.IBaseMapper;
-import com.keray.common.service.ienum.SystemOperationAction;
 import com.keray.common.annotation.SystemOperationLogAop;
+import com.keray.common.service.ienum.SystemOperationAction;
 import com.keray.common.service.mapper.SystemOperationLogMapper;
 import com.keray.common.service.model.SystemOperationLogModel;
 import com.keray.common.service.service.ISystemOperationLogService;
@@ -32,7 +32,7 @@ import java.util.List;
 @Service("v3SystemOperationLogService")
 @Aspect
 @ConditionalOnProperty(value = "keray.operation-log",havingValue = "true")
-public class SystemOperationLogServiceImpl extends BaseServiceImpl<SystemOperationLogModel> implements ISystemOperationLogService {
+public class SystemOperationLogServiceImpl implements BaseService<SystemOperationLogModel>, ISystemOperationLogService {
     @Resource
     private SystemOperationLogMapper systemOperationLogMapper;
 
