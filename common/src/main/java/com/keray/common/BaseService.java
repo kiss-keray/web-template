@@ -221,7 +221,7 @@ public interface BaseService<T extends IBaseEntity> {
     }
 
 
-    default Page<T> pageProcessing(Page<T> page) {
+    default <E extends IBaseEntity> Page<E> pageProcessing(Page<E> page) {
         if (this instanceof SortService) {
             List<OrderItem> orders = page.orders();
             if (CollUtil.isEmpty(orders)) {
