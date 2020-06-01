@@ -1,0 +1,68 @@
+/* 文字颜色 */
+.f-c-000 {
+    color: #000000;
+}
+.f-c-666 {
+    color: #666666;
+}
+
+.f-c-fff {
+    color: #ffffff;
+}
+
+.f-c-333 {
+    color: #333333;
+}
+
+.f-c-grey {
+    color: #9598A2;
+}
+
+.f-c-9d {
+    color: #9D9D9D;
+}
+
+.f-c-9b {
+    color: #9b9b9b;
+}
+
+.f-c-a6a {
+    color: #A6A6A6;
+}
+
+.f-c-d6d {
+    color: #D6D6D6;
+}
+.f-c-999 {
+    color: #999;
+}
+.f-c-97 {
+    color: #979797;
+}
+.f-c-75 {
+    color: #757575;
+}
+.f-c-f23 {
+    color: #FF2323;
+}
+
+/* 背景色 */
+.b-c-fff {
+    background-color: #ffffff;
+}
+
+.b-c-666 {
+    background-color: #666;
+}
+
+.b-c-f1f {
+    background-color: #f1f1f1;
+}
+
+.b-c-dcd {
+    background-color: #dcdcdc;
+}
+
+.b-c-bdb {
+    background-color: #BDBDBD;
+}
