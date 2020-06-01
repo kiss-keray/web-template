@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alicloud-nas-controller
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: alicloud-nas-controller
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: alicloud-nas-controller
+    spec:
+      tolerations:
+        - operator: "Exists"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: node-role.kubernetes.io/master
+                    operator: Exists
+      priorityClassName: system-node-critical
+      hostNetwork: true
+      containers:
+        - name: nfs-provisioner
+          image: registry.cn-hangzhou.aliyuncs.com/acs/alicloud-nas-controller:v1.14.3.8-58bf821-aliyun
+          env:
+            - name: PROVISIONER_NAME
+              value: alicloud/nas
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /var/log
+              name: log
+      volumes:
+        - hostPath:
+            path: /var/log
+          name: log

@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: eip-nfs-docker
+  name: eip-nfs-docker
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eip-nfs-docker
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: eip-nfs-docker
+    spec:
+      containers:
+        - env:
+            - name: PROVISIONER_NAME
+              value: nfs-docker
+            - name: NFS_SERVER
+              value: 3fafc4b237-hhd94.cn-shanghai.nas.aliyuncs.com
+            - name: NFS_PATH
+              value: /docker
+          image: 'quay.io/external_storage/nfs-client-provisioner:v3.1.0-k8s1.11'
+          name: nfs-client-provisioner
+          volumeMounts:
+            - mountPath: /persistentvolumes
+              name: nfs-client-root
+      serviceAccountName: eip-nfs-client-provisioner
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            path: /docker
+            server: 3fafc4b237-hhd94.cn-shanghai.nas.aliyuncs.com
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    k8s.eip.work/storageNamespace: docker
+    k8s.eip.work/storageType: nfs_client_provisioner
+  name: docker
+mountOptions:
+  - 'nolock,tcp,noresvport'
+  - vers=3
+parameters:
+  archiveOnDelete: 'false'
+provisioner: nfs-docker
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+

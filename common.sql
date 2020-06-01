@@ -1,83 +1,47 @@
-/*
-Navicat MySQL Data Transfer
+create table sys_config
+(
+    id          varchar(64)      not null comment '主键'
+        primary key,
+    create_time datetime         null comment '创建时间',
+    modify_time datetime         null comment '修改时间',
+    deleted     bit default b'0' null comment '0 未删除/ 1 删除',
+    delete_time datetime         null comment '删除时间',
+    create_by   varchar(64)      null comment '创建来源',
+    modify_by   varchar(64)      null comment '修改来源',
+    `key`       varchar(128)     null comment '配置key',
+    value       longtext         null comment 'value',
+    status      int              null comment '状态|0 无效|1 有效',
+    type        int default 1    null comment '配置类型',
+    config_desc varchar(256)     null comment '描述'
+)
+    comment '系统配置（v3）' charset = utf8;
 
-Source Server         : mysql
-Source Server Version : 50721
-Source Host           : localhost:3306
-Source Database       : ticketsystem
+create index sys_config__index_key
+    on sys_config (`key`);
 
-Target Server Type    : MYSQL
-Target Server Version : 50721
-File Encoding         : 65001
+create table sys_schedule
+(
+    id             varchar(64)      not null comment '主键'
+        primary key,
+    create_time    datetime         null comment '创建时间',
+    modify_time    datetime         null comment '修改时间',
+    deleted        bit default b'0' null comment '0 未删除/ 1 删除',
+    delete_time    datetime         null comment '删除时间',
+    create_by      varchar(64)      null comment '创建来源',
+    modify_by      varchar(64)      null comment '修改来源',
+    status         varbinary(64)    null comment '任务状态',
+    driver_id      varchar(256)     null comment '设备id',
+    bean_name      varchar(256)     null comment 'beanName',
+    kz_cron        varchar(128)     null comment 'kz_cron表达式{"kz":[""],"cron":[]}',
+    method_detail  varchar(1024)    null comment '方法签名',
+    retry_count    int              null comment '重试次数',
+    retry_millis   int default 1000 null comment '任务重试间隔毫秒',
+    exec_time      datetime         null comment '任务执行时间',
+    plat_exec_time datetime         null comment '计划执行时间',
+    schedule_desc  varchar(256)     null comment '任务描述'
+)
+    comment '系统分布式任务（v3）';
 
-Date: 2018-05-18 20:09:29
-*/
+create index index_status
+    on sys_schedule (status);
 
-SET FOREIGN_KEY_CHECKS=0;
-
--- ----------------------------
--- Table structure for member
--- ----------------------------
-DROP TABLE IF EXISTS `member`;
-CREATE TABLE `member` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id主键（自增）',
-  `createDate` datetime NOT NULL COMMENT '创建日期',
-  `updateDate` datetime NOT NULL COMMENT '更新日期',
-  `username` varchar(32) NOT NULL COMMENT '用户名',
-  `password` varchar(32) NOT NULL COMMENT '密码',
-  `name` varchar(255) DEFAULT NULL COMMENT '姓名',
-  `age` int(11) DEFAULT '0' COMMENT '年龄',
-  `sex` bit(1) DEFAULT b'0' COMMENT '性别',
-  `balance` decimal(10,0) DEFAULT '0' COMMENT '余额',
-  `img` varchar(255) DEFAULT NULL COMMENT '头像路径',
-  `phone` varchar(11) DEFAULT NULL COMMENT '电话',
-  `role` int(11) DEFAULT NULL COMMENT '角色',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username_index` (`username`) USING HASH,
-  KEY `fk_user_role` (`role`),
-  CONSTRAINT `fk_user_role` FOREIGN KEY (`role`) REFERENCES `role` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for role
--- ----------------------------
-DROP TABLE IF EXISTS `role`;
-CREATE TABLE `role` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id主键（自增）',
-  `createDate` datetime NOT NULL COMMENT '创建日期',
-  `updateDate` datetime NOT NULL COMMENT '更新日期',
-  `name` varchar(255) NOT NULL COMMENT '角色名',
-  `value` varchar(255) DEFAULT NULL COMMENT '角色值',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `role_name` (`name`) USING HASH
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for role_roleinterface
--- ----------------------------
-DROP TABLE IF EXISTS `role_roleinterface`;
-CREATE TABLE `role_roleinterface` (
-  `role` int(11) NOT NULL COMMENT '角色id',
-  `interface` int(11) NOT NULL COMMENT '接口id',
-  PRIMARY KEY (`role`,`interface`),
-  KEY `fk_interface` (`interface`),
-  CONSTRAINT `fk_interface` FOREIGN KEY (`interface`) REFERENCES `roleinterface` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_role` FOREIGN KEY (`role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for roleinterface
--- ----------------------------
-DROP TABLE IF EXISTS `roleinterface`;
-CREATE TABLE `roleinterface` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id主键（自增）',
-  `createDate` datetime NOT NULL COMMENT '创建日期',
-  `updateDate` datetime NOT NULL COMMENT '更新日期',
-  `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `enabled` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否启用',
-  `group` varchar(100) DEFAULT NULL COMMENT '分组',
-  `url` varchar(255) NOT NULL COMMENT 'url',
-  `name` varchar(255) DEFAULT NULL COMMENT '接口名',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `url_index` (`url`) USING HASH
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;

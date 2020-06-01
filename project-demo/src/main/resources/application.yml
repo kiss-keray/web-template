@@ -1,0 +1,152 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 3600
+  tomcat:
+    max-threads: 500
+    accept-count: 1000
+spring:
+  application:
+    name: project-demo
+  profiles:
+    active: dev
+    include: config
+  cache:
+    type: redis
+    ehcache:
+      config: classpath:/ehcache.xml
+  redis:
+    database: 1
+    api-db: 2
+    cache-db: 3
+    redisson-db: 4
+    important-db: 5
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 连接池的配置信息
+      # 初始化大小，最小，最大
+      initial-size: 20
+      min-idle: 5
+      maxActive: 200
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      filters: stat,wall,slf4j
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      # 配置DruidStatFilter
+      web-stat-filter:
+        enabled: true
+        url-pattern: "/*"
+        exclusions: "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*"
+      # 配置DruidStatViewServlet
+      stat-view-servlet:
+        enabled: false
+      filter:
+        wall:
+          config:
+            multi-statement-allow: true
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.keray.common.service.model,com.keray.model
+  # 支持统配符 * 或者 ; 分割
+  type-enums-package: com.keray.common.service.ienum.*,com.keray.common.service.ienum,com.keray.ienum.*,com.keray.ienum
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 1
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+  configuration:
+    #配置返回数据库(column下划线命名&&返回java实体是驼峰命名)，自动匹配无需as（没开启这个，SQL需要写as： select user_id as userId）
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #配置JdbcTypeForNull, oracle数据库必须配置
+    jdbc-type-for-null: 'null'
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+keray:
+  schedule: false # 定时任务配置
+  api:
+    json:
+      open: true # json解析
+      global-switch: # 全局开启json解析
+    data: true # 接口qps配置
+    time: false # 接口时长统计
+
+# log
+logging:
+  config: classpath:logback-${spring.profiles.active}.xml
+  path: /var/logs/${spring.application.name}
+
+#########################################################################dev###################################################################
+---
+spring:
+  profiles: dev
+# log
+logging:
+  level:
+    root: info
+  path: ./log/${spring.application.name}
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+---
+
+#########################################################################daily###################################################################
+---
+spring:
+  profiles: daily
+# log
+logging:
+  level:
+    root: info
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+---
+
+#########################################################################pro###################################################################
+---
+spring:
+  profiles: pro
+auth:
+  jwt:
+    token-ex-time: 3600
+    enable-same-check: true
+
+# log
+logging:
+  level:
+    root: info
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+---

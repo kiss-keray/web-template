@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ include "web-project.namespace" . }}
+  name: {{ include "web-project.fullname" . }}
+  labels:
+    {{- include "web-project.labels" . | nindent 4 }}
+  annotations:
+    k8s.eip.work/displayName: {{ include "web-project.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "web-project.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "web-project.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "web-project.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: log
+          persistentVolumeClaim:
+            claimName: logs
+        - name: config
+          persistentVolumeClaim:
+            claimName: config
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: daily
+              value: "{{ date "20060102150405" .Release.Time }}"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            httpGet:
+              path: {{.Values.livenessProbePath}}
+              port: {{.Values.appPort}}
+          readinessProbe:
+            initialDelaySeconds: 30
+            httpGet:
+              path: {{.Values.readinessProbePath}}
+              port: {{.Values.appPort}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/logs/
+              mountPropagation: HostToContainer
+              name: log
+              readOnly: false
+              subPath: ./cstk
+            - mountPath: /opt/config
+              mountPropagation: HostToContainer
+              name: config
+              readOnly: false
+              subPath: ./cstk
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

@@ -1,0 +1,10 @@
+<ehcache>
+
+    <diskStore path="java.io.tmpdir"/>
+    <defaultCache maxElementsInMemory="10000" eternal="false"
+                  timeToIdleSeconds="600" timeToLiveSeconds="600" overflowToDisk="false"/>
+
+    <!--  大对象，实时性高，更新率高，10分钟存活时间  开启磁盘-->
+    <cache name="cache:tree_data_cache" timeToLiveSeconds="600" overflowToDisk="false"/>
+
+</ehcache>
