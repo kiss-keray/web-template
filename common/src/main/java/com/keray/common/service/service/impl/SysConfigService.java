@@ -27,9 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -135,8 +133,7 @@ public class SysConfigService implements BaseService<SysConfigModel> {
      */
     @PostConstruct
     public void initDiamond() {
-        Field[] fields = this.getClass().getDeclaredFields();
-        for (Field field : fields) {
+        for (Field field : getFields(this.getClass(), new LinkedList<>())) {
             DiamondSupport diamondSupport = field.getAnnotation(DiamondSupport.class);
             if (diamondSupport != null) {
                 log.info("diamond 扫描字段：key={},name={},type={}", diamondSupport.key(), diamondSupport.name(), field.getType().getSimpleName());
@@ -144,6 +141,14 @@ public class SysConfigService implements BaseService<SysConfigModel> {
             }
         }
         this.loadConfig();
+    }
+
+    public List<Field> getFields(Class<?> clazz, List<Field> fields) {
+        if (clazz == null) {
+            return fields;
+        }
+        fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        return getFields(clazz.getSuperclass(), fields);
     }
 
     /**
