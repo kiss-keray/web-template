@@ -54,9 +54,6 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     @Autowired(required = false)
     private ApiDataInterceptor apiDataInterceptor;
 
-    @Autowired(required = false)
-    private ApiTimeInterceptor apiTimeInterceptor;
-
     @Resource(name = "mvcConversionService")
     private FormattingConversionService formattingConversionService;
 
@@ -65,9 +62,6 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         if (apiDataInterceptor != null) {
             registry.addInterceptor(apiDataInterceptor);
-        }
-        if (apiTimeInterceptor != null) {
-            registry.addInterceptor(apiTimeInterceptor);
         }
     }
 
