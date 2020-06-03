@@ -31,7 +31,7 @@ import java.time.ZoneId;
 public class ApiTimeInterceptor implements ServletInvocableHandlerMethodHandler {
 
     @Resource(name = "apiTimeRecord")
-    private ApiTimeRecordDao<ApiTimeRecordModel> apiTimeRecordDao;
+    private ApiTimeRecordDao apiTimeRecordDao;
 
 
     @Override
