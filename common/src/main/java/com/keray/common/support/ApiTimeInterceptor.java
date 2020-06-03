@@ -1,7 +1,9 @@
 package com.keray.common.support;
 
-import com.keray.common.annotation.ApiTimeRecord;
 import com.keray.common.SysThreadPool;
+import com.keray.common.annotation.ApiTimeRecord;
+import com.keray.common.config.ServletInvocableHandlerMethodCallback;
+import com.keray.common.config.ServletInvocableHandlerMethodHandler;
 import com.keray.common.support.api.time.dao.ApiTimeRecordDao;
 import com.keray.common.support.api.time.model.ApiTimeRecordModel;
 import com.keray.common.utils.CommonUtil;
@@ -9,13 +11,11 @@ import com.keray.common.utils.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -28,40 +28,48 @@ import java.time.ZoneId;
 @Component("apiTimeInterceptor")
 @ConditionalOnProperty(value = "keray.api.time", havingValue = "true")
 @Slf4j
-public class ApiTimeInterceptor extends HandlerInterceptorAdapter {
+public class ApiTimeInterceptor implements ServletInvocableHandlerMethodHandler {
 
     @Resource(name = "apiTimeRecord")
     private ApiTimeRecordDao<ApiTimeRecordModel> apiTimeRecordDao;
 
-    private final ThreadLocal<TimeData> timeRecord = new ThreadLocal<>();
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod method = ((HandlerMethod) handler);
-            ApiTimeRecord record = method.getMethodAnnotation(ApiTimeRecord.class);
-            if (record == null) {
-                record = CommonUtil.getClassAllAnnotation(((HandlerMethod) handler).getMethod().getDeclaringClass(), ApiTimeRecord.class);
-            }
-            if (record != null) {
-                TimeData data = new TimeData();
-                data.start = System.currentTimeMillis();
-                timeRecord.set(data);
-                // api接口开启了记录
-                data.gt = record.gt();
-                if ("".equals(record.value())) {
-                    data.title = method.getMethod().getName();
-                } else {
-                    data.title = record.value();
-                }
-            }
-        }
-        return true;
+    public Integer order() {
+        return 0;
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        TimeData data = timeRecord.get();
+    public Object work(HandlerMethod handlerMethod, Object[] args, NativeWebRequest request, ServletInvocableHandlerMethodCallback callback) throws Exception {
+        TimeData data = preHandle(handlerMethod);
+        try {
+            return callback.get(this);
+        } finally {
+            postHandle(data, request.getNativeRequest(HttpServletRequest.class) , handlerMethod);
+        }
+    }
+
+    public TimeData preHandle(HandlerMethod handler) {
+        ApiTimeRecord record = handler.getMethodAnnotation(ApiTimeRecord.class);
+        if (record == null) {
+            record = CommonUtil.getClassAllAnnotation(handler.getMethod().getDeclaringClass(), ApiTimeRecord.class);
+        }
+        if (record != null) {
+            TimeData data = new TimeData();
+            data.start = System.currentTimeMillis();
+            // api接口开启了记录
+            data.gt = record.gt();
+            if ("".equals(record.value())) {
+                data.title = handler.getMethod().getName();
+            } else {
+                data.title = record.value();
+            }
+            return data;
+        }
+        return null;
+    }
+
+    private void postHandle(TimeData data, HttpServletRequest request,  HandlerMethod handlerMethod) {
         if (data != null) {
             data.end = System.currentTimeMillis();
             String url;
@@ -73,7 +81,6 @@ public class ApiTimeInterceptor extends HandlerInterceptorAdapter {
             String finalUrl = url;
             SysThreadPool.execute(() -> {
                 if (data.end - data.start > data.gt) {
-                    HandlerMethod handlerMethod = (HandlerMethod) handler;
                     apiTimeRecordDao.insert(ApiTimeRecordModel.builder()
                             .execTime((int) (data.end - data.start))
                             .gt(data.gt)
@@ -85,12 +92,6 @@ public class ApiTimeInterceptor extends HandlerInterceptorAdapter {
                 }
             }, false);
         }
-    }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        timeRecord.remove();
-        super.afterCompletion(request, response, handler, ex);
     }
 
     private static class TimeData {
