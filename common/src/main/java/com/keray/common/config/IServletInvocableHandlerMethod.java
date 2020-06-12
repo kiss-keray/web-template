@@ -30,7 +30,7 @@ public class IServletInvocableHandlerMethod extends ServletInvocableHandlerMetho
         if (handlers != null) {
             final AtomicInteger index = new AtomicInteger(0);
             AtomicReference<ServletInvocableHandlerMethodCallback> callback1 = new AtomicReference<>(null);
-            ServletInvocableHandlerMethodCallback callback = _this -> {
+            ServletInvocableHandlerMethodCallback callback = () -> {
                 index.getAndIncrement();
                 if (index.get() == handlers.length) {
                     return doInvoke(args);
@@ -43,6 +43,5 @@ public class IServletInvocableHandlerMethod extends ServletInvocableHandlerMetho
             return doInvoke(args);
         }
     }
-
 
 }

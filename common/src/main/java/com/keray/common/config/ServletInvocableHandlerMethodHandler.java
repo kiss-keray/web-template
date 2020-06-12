@@ -14,6 +14,6 @@ public interface ServletInvocableHandlerMethodHandler {
     }
 
     default Object work(HandlerMethod handlerMethod, Object[] args, NativeWebRequest request, ServletInvocableHandlerMethodCallback callback) throws Exception {
-        return callback.get(this);
+        return callback.get();
     }
 }

@@ -4,7 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.keray.common.IBaseEntity;
 import com.keray.common.Result;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -19,9 +22,21 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Configuration
-public class ErrorLogServletInvocableHandlerMethodHandler implements ServletInvocableHandlerMethodHandler{
+@ConfigurationProperties(prefix = "api.log")
+public class ApiLogServletInvocableHandlerMethodHandler implements ServletInvocableHandlerMethodHandler {
+
+    @Getter
+    @Setter
+    private Boolean all;
+
+    @Override
+    public Integer order() {
+        return 0;
+    }
+
     @Override
     public Object work(HandlerMethod handlerMethod, Object[] args, NativeWebRequest request, ServletInvocableHandlerMethodCallback callback) throws Exception {
+        long start = System.nanoTime();
         for (Object o : args) {
             if (o instanceof IBaseEntity) {
                 ((IBaseEntity) o).clearBaseField();
@@ -29,7 +44,7 @@ public class ErrorLogServletInvocableHandlerMethodHandler implements ServletInvo
         }
         Consumer<Object> logFail = result -> {
             try {
-                if (result instanceof Result.FailResult || result instanceof Exception) {
+                if (result instanceof Result.FailResult || result instanceof Exception || all) {
                     String url = null;
                     String flag = null;
                     try {
@@ -50,14 +65,14 @@ public class ErrorLogServletInvocableHandlerMethodHandler implements ServletInvo
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    logFail(result, url, flag, args, handlerMethod.getMethodParameters());
+                    apiLog(result instanceof Result.FailResult || result instanceof Exception, result, url, flag, args, handlerMethod.getMethodParameters(), start);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         };
         try {
-            Object result = callback.get(this);
+            Object result = callback.get();
             logFail.accept(result);
             return result;
         } catch (Exception e) {
@@ -66,27 +81,33 @@ public class ErrorLogServletInvocableHandlerMethodHandler implements ServletInvo
         }
     }
 
-    private void logFail(Object result, String url, String flag, Object[] args, MethodParameter[] parameters) {
+    private void apiLog(boolean fail, Object result, String url, String flag, Object[] args, MethodParameter[] parameters, long start) {
         StringBuilder builder = new StringBuilder();
-        builder.append("\n").append("============接口异常============").append("\n");
-        builder.append("  flag:").append(flag).append("\n");
-        builder.append("   url:").append(url).append("\n");
-        builder.append("  args:").append("\n");
+        if (fail) {
+            builder.append(System.lineSeparator()).append("============接口异常============").append(System.lineSeparator());
+        } else {
+            builder.append(System.lineSeparator()).append("============api start============").append(System.lineSeparator());
+        }
+        builder.append("  flag:").append(flag).append(System.lineSeparator());
+        builder.append("   url:").append(url).append(System.lineSeparator());
+        builder.append("  args:").append(System.lineSeparator());
         for (int i = 0; i < parameters.length; i++) {
             String json = "json解析失败";
             try {
                 json = args[i] == null ? null : JSON.toJSONString(args[i]);
             } catch (Exception ignore) {
             }
-            builder.append(parameters[i].getParameterName()).append("=").append(json).append("\n");
+            builder.append(parameters[i].getParameterName()).append("=").append(json).append(System.lineSeparator());
         }
         if (result instanceof Result.FailResult) {
-            builder.append("result:").append(StrUtil.format("code={},message={}", ((Result) result).getCode(), ((Result.FailResult) result).getMessage())).append("\n");
+            builder.append("result:").append(StrUtil.format("code={},message={}", ((Result) result).getCode(), ((Result.FailResult) result).getMessage())).append(System.lineSeparator());
+        } else if (result instanceof Result.SuccessResult){
+            builder.append("result:").append(JSON.toJSONString(((Result.SuccessResult) result).getData())).append(System.lineSeparator());
         } else {
-            builder.append("result:").append(result.getClass()).append("\n");
+            builder.append("result:").append(result.getClass()).append(System.lineSeparator());
         }
-        builder.append("============end============");
-        builder.append("\n");
+        builder.append(String.format("============end time=ns:%s  ============",System.nanoTime() - start));
+        builder.append(System.lineSeparator());
         log.error(builder.toString());
     }
 }

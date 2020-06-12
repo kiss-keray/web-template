@@ -43,7 +43,7 @@ public class ApiTimeInterceptor implements ServletInvocableHandlerMethodHandler 
     public Object work(HandlerMethod handlerMethod, Object[] args, NativeWebRequest request, ServletInvocableHandlerMethodCallback callback) throws Exception {
         TimeData data = preHandle(handlerMethod);
         try {
-            return callback.get(this);
+            return callback.gApiLogServletInvocableHandlerMethodHandleret();
         } finally {
             postHandle(data, request.getNativeRequest(HttpServletRequest.class) , handlerMethod);
         }
