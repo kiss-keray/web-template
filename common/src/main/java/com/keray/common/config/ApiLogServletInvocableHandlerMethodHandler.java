@@ -27,7 +27,7 @@ public class ApiLogServletInvocableHandlerMethodHandler implements ServletInvoca
 
     @Getter
     @Setter
-    private Boolean all;
+    private Boolean all = false;
 
     @Override
     public Integer order() {
@@ -108,6 +108,10 @@ public class ApiLogServletInvocableHandlerMethodHandler implements ServletInvoca
         }
         builder.append(String.format("============end time=ns:%s  ============",System.nanoTime() - start));
         builder.append(System.lineSeparator());
-        log.error(builder.toString());
+        if (fail) {
+            log.error(builder.toString());
+        } else {
+            log.info(builder.toString());
+        }
     }
 }

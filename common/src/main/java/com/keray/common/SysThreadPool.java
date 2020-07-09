@@ -8,7 +8,7 @@ import java.util.concurrent.*;
  * date:2019/9/16 11:49
  */
 public class SysThreadPool {
-    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(100, 1000, 10,
+    private static final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(100, 1000, 10,
             TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(10000000),
             r -> {
                 Thread t = new Thread(r);

@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @EnableTransactionManagement
 @MapperScan(value = {
-        "com.keray.common.service.mapper"
+        "com.keray.common.service.mapper",
+        "com.keray.mapper"
 })
 @EnableConfigurationProperties
 @EnableCaching

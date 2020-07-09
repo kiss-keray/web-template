@@ -1,20 +1,27 @@
 package com.keray;
 
-import static org.junit.Assert.assertTrue;
-
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.keray.mapper.PlusMapper;
+import com.keray.model.PlusModel;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-{
-    /**
-     * Rigorous Test :-)
-     */
+import javax.annotation.Resource;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = WebStart.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+public class AppTest {
+
+    @Resource
+    private PlusMapper plusMapper;
+
     @Test
-    public void shouldAnswerWithTrue()
-    {
-        assertTrue( true );
+    public void selectOneTest() {
+        System.out.println(plusMapper.selectOne(
+                Wrappers.lambdaQuery(new PlusModel())
+                .eq(PlusModel::getName, "keray")
+        ));
     }
 }

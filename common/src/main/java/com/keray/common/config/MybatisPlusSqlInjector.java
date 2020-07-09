@@ -184,12 +184,12 @@ public class MybatisPlusSqlInjector {
     private static final class ILogicSelectOne extends BaseAbstractLogicMethod {
         @Override
         public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
-            SqlMethod sqlMethod = SqlMethod.SELECT_ONE;
-            SqlSource sqlSource = languageDriver.createSqlSource(configuration, String.format(sqlMethod.getSql(),
+//            SqlMethod sqlMethod = SqlMethod.SELECT_ONE;
+            SqlSource sqlSource = languageDriver.createSqlSource(configuration, String.format("<script>%s SELECT %s FROM %s %s LIMIT 2 %s\n</script>",
                     sqlFirst(), this.sqlSelectColumns(tableInfo, true), tableInfo.getTableName(),
                     this.sqlWhereEntityWrapper(true, tableInfo), sqlComment()),
                     modelClass);
-            return this.addSelectMappedStatementForTable(mapperClass, sqlMethod.getMethod(), sqlSource, tableInfo);
+            return this.addSelectMappedStatementForTable(mapperClass, "selectOne", sqlSource, tableInfo);
         }
     }
 
