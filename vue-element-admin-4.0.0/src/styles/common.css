@@ -1,0 +1,412 @@
+@media only screen and (max-width: 3840px),
+only screen and (max-device-width:3840px) {
+
+    html,
+    body {
+        font-size: 48px;
+    }
+}
+
+@media only screen and (max-width: 2560px),
+only screen and (max-device-width:2560px) {
+
+    html,
+    body {
+        font-size: 32px;
+    }
+}
+
+@media only screen and (max-width: 2048px),
+only screen and (max-device-width:2048px) {
+
+    html,
+    body {
+        font-size: 25.6px;
+    }
+}
+
+@media only screen and (max-width: 1920px),
+only screen and (max-device-width:1920px) {
+
+    html,
+    body {
+        font-size: 24px;
+    }
+}
+
+@media only screen and (max-width: 1768px),
+only screen and (max-device-width:1768px) {
+
+    html,
+    body {
+        font-size: 22.1px;
+    }
+}
+
+@media only screen and (max-width: 1680px),
+only screen and (max-device-width:1680px) {
+
+    html,
+    body {
+        font-size: 21px;
+    }
+}
+
+@media only screen and (max-width: 1600px),
+only screen and (max-device-width:1600px) {
+
+    html,
+    body {
+        font-size: 20px;
+    }
+}
+
+@media only screen and (max-width: 1440px),
+only screen and (max-device-width:1440px) {
+
+    html,
+    body {
+        font-size: 18px;
+    }
+}
+
+@media only screen and (max-width: 1366px),
+only screen and (max-device-width:1366px) {
+
+    html,
+    body {
+        font-size: 17.75px;
+    }
+}
+
+@media only screen and (max-width: 1280px),
+only screen and (max-device-width:1280px) {
+
+    html,
+    body {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 1200px),
+only screen and (max-device-width:1200px) {
+
+    html,
+    body {
+        font-size: 23.04px;
+    }
+}
+
+@media only screen and (max-width: 1024px),
+only screen and (max-device-width:1024px) {
+
+    html,
+    body {
+        font-size: 19.6608px;
+    }
+}
+
+/* @media only screen and (max-width: 800px),
+only screen and (max-device-width:800px) {
+
+    html,
+    body {
+        font-size: 10px;
+    }
+}
+
+
+@media only screen and (max-width: 720px),
+only screen and (max-device-width:720px) {
+
+    html,
+    body {
+        font-size: 9px;
+    }
+} */
+/*
+@media only screen and (max-width: 640px),
+only screen and (max-device-width:640px) {
+
+    html,
+    body {
+        font-size: 8px;
+    }
+}
+
+@media only screen and (max-width: 600px),
+only screen and (max-device-width:600px) {
+
+    html,
+    body {
+        font-size: 7.5px;
+    }
+}
+
+@media only screen and (max-width: 540px),
+only screen and (max-device-width:540px) {
+
+    html,
+    body {
+        font-size: 6.75px;
+    }
+}
+
+@media only screen and (max-width: 480px),
+only screen and (max-device-width:480px) {
+
+    html,
+    body {
+        font-size: 6px;
+    }
+} */
+
+/*布局*/
+* {
+    /* font-family: 'Microsoft YaHei'; */
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.marginAuto {
+    margin: 0 auto !important;
+}
+
+.i-xy-center,
+.i-yx-center {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.i-yx-center {
+    flex-direction: column;
+}
+
+.xy-center,
+.yx-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yx-center {
+    flex-direction: column;
+}
+
+.i-xy-between,
+.i-yx-between {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.i-yx-between {
+    flex-direction: column;
+}
+
+.xy-between,
+.yx-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flexWarp {
+    flex-wrap: wrap;
+}
+
+.yx-between {
+    flex-direction: column;
+}
+
+.jf-start {
+    justify-content: flex-start;
+}
+
+.jf-end {
+    justify-content: flex-end;
+}
+
+.al-start {
+    align-items: flex-start;
+}
+
+.al-end {
+    align-items: flex-end;
+}
+
+.al-str {
+    align-items: stretch;
+}
+
+.auto-grow {
+    flex-grow: 1;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.full-height {
+    height: 100%;
+}
+
+.hidden {
+    display: none;
+}
+
+.no-wrap-text {
+    white-space: nowrap;
+}
+
+.one-wrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.two-wrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.three-wrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.third-wrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.pointer {
+    cursor: pointer;
+}
+.wait {
+    cursor: wait;
+}
+.no-mouse {
+    cursor: not-allowed;
+}
+/*其他*/
+
+.border-radius-box {
+    border-radius: 0.5rem;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.left-title {
+    margin-right: 0.33rem;
+}
+
+.member-header {
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+
+.fontSize5 {
+    font-size: 0.5rem;
+}
+
+.fontSize53 {
+    font-size: 0.53rem;
+}
+
+.fontSize58 {
+    font-size: 0.58rem;
+}
+
+.fontSize67 {
+    font-size: 0.67rem;
+}
+
+.fontSize75 {
+    font-size: 0.75rem;
+}
+
+.fontSize76 {
+    font-size: 0.76rem;
+}
+
+.fontSize92 {
+    font-size: 0.92rem;
+}
+
+.p {
+    line-height: 0.75rem;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.textJustify {
+    text-align: justify;
+}
+
+.FW600 {
+    font-weight: 600;
+}
+.FW300 {
+    font-weight: 300;
+}
+.Color333 {
+    color: #333;
+}
+
+.Color666 {
+    color: #666;
+}
+
+.bgColor666 {
+    background: #666;
+}
+
+.flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.between {
+    display: flex;
+    justify-content: space-between;
+}
+
+.FW600 {
+    font-weight: 600;
+}
+
+.color9d {
+    color: #9D9D9D;
+}
+
+.padding-1rem {
+    padding: 1rem;
+}
+
+.positionAbsolute {
+    position: absolute
+}
+
+.positionRelative {
+    position: relative
+}

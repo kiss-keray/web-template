@@ -14,7 +14,7 @@ create table sys_config
     type        int default 1    null comment '配置类型',
     config_desc varchar(256)     null comment '描述'
 )
-    comment '系统配置（v3）' charset = utf8;
+    comment '系统配置（v3）' charset = utf8mb4;
 
 create index sys_config__index_key
     on sys_config (`key`);
@@ -40,7 +40,7 @@ create table sys_schedule
     plat_exec_time datetime         null comment '计划执行时间',
     schedule_desc  varchar(256)     null comment '任务描述'
 )
-    comment '系统分布式任务（v3）';
+    comment '系统分布式任务（v3）' charset = utf8mb4;
 
 create index index_status
     on sys_schedule (status);

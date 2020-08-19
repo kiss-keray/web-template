@@ -114,7 +114,14 @@ logging:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
+keray:
+  schedule: true # 定时任务配置
+  api:
+    json:
+      open: true # json解析
+      global-switch: true # 全局开启json解析
+    data: true # 接口qps配置
+    time: false # 接口时长统计
 ---
 
 #########################################################################daily###################################################################

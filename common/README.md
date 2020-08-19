@@ -8,7 +8,8 @@ keray:
       global-switch: # 全局开启json解析
     data: true # 接口qps配置
     time: true # 接口时长统计
-    
+    log: 
+      all: true #api日志
 ```
 
 ## cache使用
