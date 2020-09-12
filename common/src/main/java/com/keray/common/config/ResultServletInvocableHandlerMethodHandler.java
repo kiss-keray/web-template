@@ -2,6 +2,8 @@ package com.keray.common.config;
 
 import com.keray.common.CommonResultCode;
 import com.keray.common.Result;
+import com.keray.common.exception.BizException;
+import com.keray.common.exception.BizRuntimeException;
 import com.keray.common.exception.CodeException;
 import com.keray.common.utils.QpsLimit;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +17,15 @@ import org.springframework.web.method.HandlerMethod;
  */
 @Slf4j
 @Configuration
-public class ResultServletInvocableHandlerMethodHandler implements ServletInvocableHandlerMethodHandler, ExceptionHandler<Throwable> {
+public class ResultServletInvocableHandlerMethodHandler<E extends Throwable> implements ServletInvocableHandlerMethodHandler, ExceptionHandler<E> {
 
-    private final static ExceptionHandler[] EXCEPTION_HANDLERS = new ExceptionHandler[]{
+    private final static ExceptionHandler<Throwable>[] EXCEPTION_HANDLERS = new ExceptionHandler[]{
+            new RuntimeExceptionHandler(),
             new CodeExceptionHandler(),
             new QpsExceptionHandler()
     };
+
+    private final ExceptionHandler<Throwable> defaultExceptionHandler = new DefaultExceptionHandler();
 
     @Override
     public Integer order() {
@@ -32,6 +37,13 @@ public class ResultServletInvocableHandlerMethodHandler implements ServletInvoca
         try {
             Object result = callback.get();
             if (result instanceof Result) {
+                if (result instanceof Result.FailResult && ((Result.FailResult<?, ?>) result).getError() != null) {
+                    ExceptionHandler<Throwable> exceptionHandler = giveExceptionHandler(((Result.FailResult<?, ?>) result).getError());
+                    if (exceptionHandler == null) {
+                        return result;
+                    }
+                    return exceptionHandler.errorHandler(((Result.FailResult<?, ?>) result).getError());
+                }
                 return result;
             }
             return Result.success(result);
@@ -48,12 +60,17 @@ public class ResultServletInvocableHandlerMethodHandler implements ServletInvoca
 
     @Override
     public Result<?> errorHandler(Throwable error) {
+        ExceptionHandler<Throwable> exceptionHandler = giveExceptionHandler(error);
+        return exceptionHandler != null ? exceptionHandler.errorHandler(error) : defaultExceptionHandler.errorHandler(error);
+    }
+
+    private ExceptionHandler<Throwable> giveExceptionHandler(Throwable e) {
         for (ExceptionHandler<Throwable> eh : EXCEPTION_HANDLERS) {
-            if (eh.supper(error)) {
-                return eh.errorHandler(error);
+            if (eh.supper(e)) {
+                return eh;
             }
         }
-        return Result.fail(CommonResultCode.unknown);
+        return null;
     }
 }
 
@@ -61,6 +78,39 @@ interface ExceptionHandler<E extends Throwable> {
     boolean supper(Throwable e);
 
     Result<?> errorHandler(E error);
+}
+
+class RuntimeExceptionHandler implements ExceptionHandler<RuntimeException> {
+
+    @Override
+    public boolean supper(Throwable e) {
+        return e instanceof RuntimeException;
+    }
+
+    @Override
+    public Result<?> errorHandler(RuntimeException error) {
+        return runtimeException(error);
+    }
+
+    private Result<?> runtimeException(RuntimeException runtimeException) {
+        Throwable exception = runtimeException;
+        int i = 0;
+        for (; exception != null && i < 10; i++) {
+            if (exception instanceof BizRuntimeException) {
+                if (((BizRuntimeException) exception).getCode() != CommonResultCode.unknown.getCode()) {
+                    return Result.fail(((BizRuntimeException) exception).getCode(), exception.getMessage(), exception);
+                }
+                exception = exception.getCause();
+                continue;
+            }
+            if (exception instanceof BizException) {
+                return Result.fail(((BizRuntimeException) exception).getCode(), exception.getMessage(), exception);
+            }
+            exception = exception.getCause();
+        }
+        return Result.fail(CommonResultCode.unknown);
+    }
+
 }
 
 /**
@@ -80,6 +130,7 @@ class CodeExceptionHandler implements ExceptionHandler<Throwable> {
     }
 }
 
+
 class QpsExceptionHandler implements ExceptionHandler<QpsLimit.QPSFailException> {
 
     @Override
@@ -90,5 +141,18 @@ class QpsExceptionHandler implements ExceptionHandler<QpsLimit.QPSFailException>
     @Override
     public Result<?> errorHandler(QpsLimit.QPSFailException error) {
         return Result.fail(CommonResultCode.limitedAccess);
+    }
+}
+
+class DefaultExceptionHandler implements ExceptionHandler<Throwable> {
+
+    @Override
+    public boolean supper(Throwable e) {
+        return true;
+    }
+
+    @Override
+    public Result<?> errorHandler(Throwable error) {
+        return Result.fail(error);
     }
 }
