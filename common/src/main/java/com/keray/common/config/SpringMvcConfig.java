@@ -1,5 +1,6 @@
 package com.keray.common.config;
 
+import com.keray.common.IUserContext;
 import com.keray.common.support.ApiDataInterceptor;
 import com.keray.common.support.ApiTimeInterceptor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.support.FormattingConversionService;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -57,11 +59,16 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     @Resource(name = "mvcConversionService")
     private FormattingConversionService formattingConversionService;
 
+    @Autowired(required = false)
+    private IUserContext userContext;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         if (apiDataInterceptor != null) {
             registry.addInterceptor(apiDataInterceptor);
+        }
+        if (userContext != null && userContext instanceof HandlerInterceptor) {
+            registry.addInterceptor((HandlerInterceptor) userContext);
         }
     }
 

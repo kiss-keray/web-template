@@ -98,17 +98,17 @@ class RuntimeExceptionHandler implements ExceptionHandler<RuntimeException> {
         for (; exception != null && i < 10; i++) {
             if (exception instanceof BizRuntimeException) {
                 if (((BizRuntimeException) exception).getCode() != CommonResultCode.unknown.getCode()) {
-                    return Result.fail(((BizRuntimeException) exception).getCode(), exception.getMessage(), exception);
+                    return Result.fail(((BizRuntimeException) exception).getCode(), exception.getMessage(), runtimeException);
                 }
                 exception = exception.getCause();
                 continue;
             }
             if (exception instanceof BizException) {
-                return Result.fail(((BizRuntimeException) exception).getCode(), exception.getMessage(), exception);
+                return Result.fail(((BizRuntimeException) exception).getCode(), exception.getMessage(), runtimeException);
             }
             exception = exception.getCause();
         }
-        return Result.fail(CommonResultCode.unknown);
+        return Result.fail(CommonResultCode.unknown, runtimeException);
     }
 
 }

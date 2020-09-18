@@ -109,7 +109,11 @@ public class ApiLogServletInvocableHandlerMethodHandler implements ServletInvoca
         builder.append(String.format("============end time=ns:%s  ============",System.nanoTime() - start));
         builder.append(System.lineSeparator());
         if (fail) {
-            log.error(builder.toString());
+            if (result instanceof Result.FailResult) {
+                log.error(builder.toString(), ((Result.FailResult<?, ?>) result).getError());
+            } else {
+                log.error(builder.toString(), result);
+            }
         } else {
             log.info(builder.toString());
         }
