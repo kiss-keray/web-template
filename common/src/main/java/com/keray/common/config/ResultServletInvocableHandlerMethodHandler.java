@@ -2,8 +2,7 @@ package com.keray.common.config;
 
 import com.keray.common.CommonResultCode;
 import com.keray.common.Result;
-import com.keray.common.exception.BizException;
-import com.keray.common.exception.BizRuntimeException;
+import com.keray.common.annotation.ResultIgnore;
 import com.keray.common.exception.CodeException;
 import com.keray.common.utils.QpsLimit;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +19,8 @@ import org.springframework.web.method.HandlerMethod;
 public class ResultServletInvocableHandlerMethodHandler<E extends Throwable> implements ServletInvocableHandlerMethodHandler, ExceptionHandler<E> {
 
     private final static ExceptionHandler<Throwable>[] EXCEPTION_HANDLERS = new ExceptionHandler[]{
-            new RuntimeExceptionHandler(),
-            new CodeExceptionHandler(),
-            new QpsExceptionHandler()
+            new QpsExceptionHandler(),
+            new CodeExceptionHandler()
     };
 
     private final ExceptionHandler<Throwable> defaultExceptionHandler = new DefaultExceptionHandler();
@@ -44,6 +42,9 @@ public class ResultServletInvocableHandlerMethodHandler<E extends Throwable> imp
                     }
                     return exceptionHandler.errorHandler(((Result.FailResult<?, ?>) result).getError());
                 }
+                return result;
+            }
+            if (handlerMethod.getMethodAnnotation(ResultIgnore.class) != null) {
                 return result;
             }
             return Result.success(result);
@@ -78,32 +79,6 @@ interface ExceptionHandler<E extends Throwable> {
     boolean supper(Throwable e);
 
     Result<?> errorHandler(E error);
-}
-
-class RuntimeExceptionHandler implements ExceptionHandler<RuntimeException> {
-
-    @Override
-    public boolean supper(Throwable e) {
-        return e instanceof RuntimeException;
-    }
-
-    @Override
-    public Result<?> errorHandler(RuntimeException error) {
-        return runtimeException(error);
-    }
-
-    private Result<?> runtimeException(RuntimeException runtimeException) {
-        Throwable exception = runtimeException;
-        int i = 0;
-        for (; exception != null && i < 10; i++) {
-            if (exception instanceof CodeException && ((CodeException) exception).getCode() != CommonResultCode.unknown.getCode()) {
-                return Result.fail(((CodeException) exception).getCode(), exception.getMessage(), runtimeException);
-            }
-            exception = exception.getCause();
-        }
-        return Result.fail(CommonResultCode.unknown, runtimeException);
-    }
-
 }
 
 /**
@@ -146,6 +121,14 @@ class DefaultExceptionHandler implements ExceptionHandler<Throwable> {
 
     @Override
     public Result<?> errorHandler(Throwable error) {
-        return Result.fail(error);
+        Throwable exception = error;
+        int i = 0;
+        for (; exception != null && i < 10; i++) {
+            if (exception instanceof CodeException && ((CodeException) exception).getCode() != CommonResultCode.unknown.getCode()) {
+                return Result.fail(((CodeException) exception).getCode(), exception.getMessage(), error);
+            }
+            exception = exception.getCause();
+        }
+        return Result.fail(CommonResultCode.unknown, error);
     }
 }
