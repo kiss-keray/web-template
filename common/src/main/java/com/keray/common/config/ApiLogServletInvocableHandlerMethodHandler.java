@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Configuration
-@ConfigurationProperties(prefix = "api.log")
+@ConfigurationProperties(prefix = "keray.api.log")
 public class ApiLogServletInvocableHandlerMethodHandler implements ServletInvocableHandlerMethodHandler {
 
     @Getter
@@ -63,17 +63,19 @@ public class ApiLogServletInvocableHandlerMethodHandler implements ServletInvoca
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("api解析标志失败：" ,e);
                     }
                     apiLog(result instanceof Result.FailResult || result instanceof Exception, result, url, flag, args, handlerMethod.getMethodParameters(), start);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("api错误日志解析失败：" ,e);
             }
         };
         try {
             Object result = callback.get();
-            logFail.accept(result);
+            if (result instanceof Result) {
+                logFail.accept(result);
+            }
             return result;
         } catch (Exception e) {
             logFail.accept(e);
@@ -101,12 +103,12 @@ public class ApiLogServletInvocableHandlerMethodHandler implements ServletInvoca
         }
         if (result instanceof Result.FailResult) {
             builder.append("result:").append(StrUtil.format("code={},message={}", ((Result) result).getCode(), ((Result.FailResult) result).getMessage())).append(System.lineSeparator());
-        } else if (result instanceof Result.SuccessResult){
+        } else if (result instanceof Result.SuccessResult) {
             builder.append("result:").append(JSON.toJSONString(((Result.SuccessResult) result).getData())).append(System.lineSeparator());
         } else {
             builder.append("result:").append(result.getClass()).append(System.lineSeparator());
         }
-        builder.append(String.format("============end time=ns:%s  ============",System.nanoTime() - start));
+        builder.append(String.format("============end time=ns:%s  ============", System.nanoTime() - start));
         builder.append(System.lineSeparator());
         if (fail) {
             if (result instanceof Result.FailResult) {
