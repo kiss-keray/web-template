@@ -14,6 +14,7 @@ public class TimeUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER_HOUR = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
     public static final DateTimeFormatter DATE_TIME_FORMATTER_DAY = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter DATE_TIME_FORMATTER_SN = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+    public static final DateTimeFormatter DATE_TIME_FORMATTER_DAY_YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /**
      * <p>

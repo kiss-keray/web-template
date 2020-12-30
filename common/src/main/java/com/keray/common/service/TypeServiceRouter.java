@@ -21,7 +21,7 @@ public class TypeServiceRouter {
      * @return <p> {@link BaseService <T>} </p>
      * @throws
      */
-    public static <T extends IBaseEntity, S extends BaseService<T>> BaseService<T> router(TypeEnum<T, S> typeEnum) {
+    public static <T extends IBaseEntity, S extends BaseService<T>> S router(TypeEnum<T, S> typeEnum) {
         return SpringContextHolder.getBean(typeEnum.getServiceBeanName());
     }
 

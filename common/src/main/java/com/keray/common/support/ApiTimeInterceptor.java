@@ -90,7 +90,7 @@ public class ApiTimeInterceptor implements ServletInvocableHandlerMethodHandler 
                             .methodPath(handlerMethod.getMethod().getDeclaringClass().getName() + "#" + handlerMethod.getMethod().getName())
                             .build());
                 }
-            }, false);
+            });
         }
     }
 

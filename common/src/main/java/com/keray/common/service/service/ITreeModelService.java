@@ -5,9 +5,9 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.keray.common.BaseService;
+import com.keray.common.IBaseEntity;
 import com.keray.common.service.CacheConstants;
 import com.keray.common.service.model.base.BaseTreeModel;
-import com.keray.common.IBaseEntity;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.util.Collections;

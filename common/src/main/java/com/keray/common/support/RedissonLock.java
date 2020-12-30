@@ -36,7 +36,11 @@ public class RedissonLock implements DistributedLock<RLock> {
         String clockKey = "redis:clock:" + key;
         RLock rLock = redissonClient.getLock(clockKey);
         rLock.tryLock(timeout, TimeUnit.MILLISECONDS);
-        execCallback(key, callback, rLock);
+        if (!Thread.currentThread().isInterrupted()) {
+            execCallback(key, callback, rLock);
+        } else {
+            throw new InterruptedException();
+        }
         return rLock;
     }
 
@@ -91,7 +95,7 @@ public class RedissonLock implements DistributedLock<RLock> {
         if (distributedLock == null) {
             synchronized (RedisLock.class) {
                 if (distributedLock == null) {
-                    distributedLock = SpringContextHolder.getBean(DistributedLock.class);
+                    distributedLock = SpringContextHolder.getBean("redissonLock");
                 }
             }
         }

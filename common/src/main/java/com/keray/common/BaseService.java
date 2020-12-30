@@ -42,8 +42,8 @@ public interface BaseService<T extends IBaseEntity> {
      * @param entity insert实体
      * @return
      */
-    default Boolean insert(T entity) {
-        return getMapper().insert(entity) == 1;
+    default T insert(T entity) {
+        return getMapper().insert(entity) == 1 ? entity : null;
     }
 
     /**
@@ -70,11 +70,11 @@ public interface BaseService<T extends IBaseEntity> {
      * @param entity update实体
      * @return
      */
-    default Boolean update(T entity) {
+    default T update(T entity) {
         if (StrUtil.isBlank(entity.getId())) {
             throw new BizRuntimeException("update必须拥有Id", CommonResultCode.dataChangeError.getCode());
         }
-        return getMapper().updateById(entity) == 1;
+        return getMapper().updateById(entity) == 1 ? entity : null;
     }
 
     /**
@@ -84,11 +84,11 @@ public interface BaseService<T extends IBaseEntity> {
      * @param entity update实体
      * @return
      */
-    default boolean simpleUpdate(T entity) {
+    default T simpleUpdate(T entity) {
         if (StrUtil.isBlank(entity.getId())) {
             throw new BizRuntimeException("update必须拥有Id", CommonResultCode.dataChangeError.getCode());
         }
-        return getMapper().updateById(entity) == 1;
+        return getMapper().updateById(entity) == 1 ? entity : null;
     }
 
     /**

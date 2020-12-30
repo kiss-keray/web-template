@@ -5,8 +5,8 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.keray.common.annotation.ApiRecord;
 import com.keray.common.SysThreadPool;
+import com.keray.common.annotation.ApiRecord;
 import com.keray.common.config.ApiDataConfig;
 import com.keray.common.utils.CommonUtil;
 import com.keray.common.utils.TimeUtil;
@@ -77,26 +77,26 @@ public class ApiDataInterceptor extends HandlerInterceptorAdapter {
                             addSecondData(now, apiKey);
                         } catch (TimeoutException | InterruptedException ignored) {
                         }
-                    }, false);
+                    });
                     SysThreadPool.execute(() -> {
                         try {
                             addMinuteData(now, apiKey);
                         } catch (TimeoutException | InterruptedException ignored) {
                         }
-                    }, false);
+                    });
                     SysThreadPool.execute(() -> {
                         try {
                             addHourData(now, apiKey);
                         } catch (TimeoutException | InterruptedException ignored) {
                         }
-                    }, false);
+                    });
                     SysThreadPool.execute(() -> {
                         try {
                             addDayData(now, apiKey);
                         } catch (TimeoutException | InterruptedException ignored) {
                         }
-                    }, false);
-                }, false);
+                    });
+                });
             }
         }
         return true;

@@ -43,7 +43,7 @@ public class SysConfigService implements BaseService<SysConfigModel> {
     @Resource
     private RabbitTemplate rabbitTemplate;
 
-    private final Map<String, Field> diamondFields = new HashMap<>();
+    protected final Map<String, Field> diamondFields = new HashMap<>();
 
     @Override
     public IBaseMapper<SysConfigModel> getMapper() {
@@ -51,7 +51,7 @@ public class SysConfigService implements BaseService<SysConfigModel> {
     }
 
     @Override
-    public Boolean insert(SysConfigModel entity) {
+    public SysConfigModel insert(SysConfigModel entity) {
         Assert.notEmpty(entity.getKey());
         try {
             notifyUpdate(entity);
@@ -64,11 +64,11 @@ public class SysConfigService implements BaseService<SysConfigModel> {
             entity.setId(old.getId());
             return this.update(entity);
         }
-        return getMapper().insert(entity) == 1;
+        return getMapper().insert(entity) == 1 ? entity : null;
     }
 
     @Override
-    public Boolean update(SysConfigModel entity) {
+    public SysConfigModel update(SysConfigModel entity) {
         Assert.notEmpty(entity.getKey());
         all:
         if (StrUtil.isBlank(entity.getId())) {
@@ -85,7 +85,7 @@ public class SysConfigService implements BaseService<SysConfigModel> {
         } catch (IllegalAccessException e) {
             throw new BizRuntimeException(CommonResultCode.dataChangeError);
         }
-        return getMapper().updateById(entity) == 1;
+        return getMapper().updateById(entity) == 1 ? entity : null;
     }
 
     public Object getValue(String key) {

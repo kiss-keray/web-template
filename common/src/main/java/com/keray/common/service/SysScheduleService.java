@@ -113,7 +113,7 @@ public class SysScheduleService implements BaseService<SysScheduleModel> {
             sysScheduleModels.stream()
                     .parallel()
                     .forEach(m -> dataScheduleSubmit(m, false));
-        }, false);
+        });
     }
 
 

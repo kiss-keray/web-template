@@ -1,14 +1,13 @@
 package com.keray.common.config;
 
-import com.keray.common.IUserContext;
-import com.keray.common.support.ApiDataInterceptor;
-import com.keray.common.support.ApiTimeInterceptor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.keray.common.IUserContext;
+import com.keray.common.support.ApiDataInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -120,7 +119,6 @@ public class SpringMvcConfig implements WebMvcConfigurer {
         objectMapper.registerModule(javaTimeModule);
         return objectMapper;
     }
-
 
     /**
      * <p>

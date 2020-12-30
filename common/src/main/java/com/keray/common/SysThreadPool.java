@@ -1,10 +1,6 @@
 package com.keray.common;
 
-import java.util.Map;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,38 +17,17 @@ public class SysThreadPool {
                 return t;
             });
 
-    private volatile static IUserContext userContext = null;
-
     public static void execute(Runnable runnable) {
-        execute(runnable, true);
+        threadPoolExecutor.execute(runnable);
     }
 
-    public static void execute(Runnable runnable, boolean useContext) {
-        if (useContext) {
-            if (userContext == null) {
-                userContext = SpringContextHolder.getBean(IUserContext.class);
-            }
-            Map<String, Object> context = userContext.export();
-            threadPoolExecutor.execute(() -> {
-                userContext.importConf(context);
-                runnable.run();
-                userContext.clear();
-            });
-        } else {
-            threadPoolExecutor.execute(runnable);
-        }
-    }
 
     public static Future<?> submit(Runnable runnable) {
-        if (userContext == null) {
-            userContext = SpringContextHolder.getBean(IUserContext.class);
-        }
-        Map<String, Object> context = userContext.export();
-        return threadPoolExecutor.submit(() -> {
-            userContext.importConf(context);
-            runnable.run();
-            userContext.clear();
-        });
+        return threadPoolExecutor.submit(runnable);
+    }
+
+    public static <T> Future<T> submit(Callable<T> task) {
+        return threadPoolExecutor.submit(task);
     }
 
     public static void close() {

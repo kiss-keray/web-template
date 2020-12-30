@@ -11,6 +11,9 @@ import java.util.Map;
  * date:2019/7/26 14:21
  */
 public interface IUserContext {
+
+    public static final String DEFAULT_USER_ID = "system";
+
     /**
      * 获取当前登陆用户的Id
      *
